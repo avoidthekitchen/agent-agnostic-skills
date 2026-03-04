@@ -1,10 +1,10 @@
 # agent-agnostic-skills
 
-This repository contains agent skills built to the `agentskills.io` specification.
+This repository contains agent skills built to the [`agentskills.io`](https://agentskills.io/specification) specification.
 
 ## Install a Skill
 
-Per `skills.sh` docs/FAQ, install skills with the `skills` CLI:
+Per [`skills.sh`](https://skills.sh/docs/cli) docs/FAQ, install skills with the `skills` CLI:
 
 ```bash
 npx skills add <owner>/<repo>
@@ -13,7 +13,6 @@ npx skills add <owner>/<repo>
 Examples:
 
 ```bash
-npx skills add vercel-labs/agent-skills
 npx skills add avoidthekitchen/agent-agnostic-skills
 ```
 
