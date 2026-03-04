@@ -2,6 +2,32 @@
 
 This repository contains agent skills built to the `agentskills.io` specification.
 
+## Install a Skill
+
+Per `skills.sh` docs/FAQ, install skills with the `skills` CLI:
+
+```bash
+npx skills add <owner>/<repo>
+```
+
+Examples:
+
+```bash
+npx skills add vercel-labs/agent-skills
+npx skills add avoidthekitchen/agent-agnostic-skills
+```
+
+To install this specific skill from this repository:
+
+```bash
+npx skills add avoidthekitchen/agent-agnostic-skills@bootstrap-checks-from-prs
+```
+
+Notes:
+
+- Skills are supported by popular coding agents such as Claude Code, Cursor, and Windsurf (check per-skill compatibility).
+- Review a skill's repository before installing and use your normal security review process.
+
 ## Included Skill: `bootstrap-checks-from-prs`
 
 `bootstrap-checks-from-prs` mines merged PR history and bootstraps draft Amp checks so teams can quickly codify recurring review expectations.
