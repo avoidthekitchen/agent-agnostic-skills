@@ -74,3 +74,11 @@ Notes:
 
 - Requires `python3` and authenticated `gh` CLI access.
 - Check file collisions are handled safely with `-draft` suffixing; existing checks are not overwritten silently.
+
+### Re-running the Skill
+
+Running the pipeline again is safe, with a few expected behaviors:
+
+- Artifact files in `artifacts/` are overwritten on each run with fresh outputs.
+- Generated check markdown files are never silently overwritten; name collisions create `-draft` / `-draft-N` variants.
+- If you want versioned artifacts per run, pass custom output paths to the scripts (for example `--output artifacts/pr-scan-2026-03-04.json`).
