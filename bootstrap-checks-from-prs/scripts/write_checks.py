@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Write draft checks to .agents/checks with collision-safe naming."""
+"""Write draft checks to .agents/checks with collision-safe naming.
+
+Also ensures Agents.md (or existing AGENTS.md) references generated .agents/checks folders for code review.
+"""
 
 from __future__ import annotations
 
@@ -58,12 +61,68 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def instructions_for_check_dir(relative_check_dir: Path) -> str:
+    check_dir = relative_check_dir.as_posix()
+    return (
+        "## Code review checks\n"
+        f"When performing code reviews, consult checks in `{check_dir}` and apply all relevant guidance.\n"
+    )
+
+
+def append_agents_reference_if_missing(repo_root: Path, relative_check_dir: Path, dry_run: bool) -> dict[str, Any]:
+    scope_root = relative_check_dir.parent.parent
+    candidate_paths = [
+        repo_root / scope_root / "Agents.md",
+        repo_root / scope_root / "AGENTS.md",
+    ]
+    agents_path = candidate_paths[0]
+    existed_before = False
+    for candidate_path in candidate_paths:
+        if candidate_path.exists():
+            agents_path = candidate_path
+            existed_before = True
+            break
+
+    check_dir = relative_check_dir.as_posix()
+    instruction_block = instructions_for_check_dir(relative_check_dir)
+
+    if existed_before:
+        existing_text = agents_path.read_text(encoding="utf-8")
+        if check_dir in existing_text:
+            return {
+                "agents_path": str(agents_path.relative_to(repo_root)),
+                "check_directory": check_dir,
+                "status": "already_referenced",
+                "existed_before": True,
+                "dry_run": dry_run,
+            }
+        separator = "\n" if existing_text.endswith("\n") else "\n\n"
+        updated_text = f"{existing_text}{separator}{instruction_block}"
+        status = "appended"
+    else:
+        updated_text = instruction_block
+        status = "created"
+
+    if not dry_run:
+        agents_path.parent.mkdir(parents=True, exist_ok=True)
+        agents_path.write_text(updated_text, encoding="utf-8")
+
+    return {
+        "agents_path": str(agents_path.relative_to(repo_root)),
+        "check_directory": check_dir,
+        "status": status,
+        "existed_before": existed_before,
+        "dry_run": dry_run,
+    }
+
+
 def main() -> int:
     args = parse_args()
     payload = read_json(Path(args.input))
     repo_root = Path(args.repo_root).resolve()
 
     results: list[dict[str, Any]] = []
+    touched_check_dirs: set[str] = set()
     for draft in payload.get("drafts", []):
         target_dir = ensure_safe_relative(str(draft.get("target_directory", ".agents/checks")))
         filename = ensure_safe_relative(str(draft.get("filename", "draft-check.md"))).name
@@ -86,6 +145,12 @@ def main() -> int:
                 "dry_run": args.dry_run,
             }
         )
+        touched_check_dirs.add(target_dir.as_posix())
+
+    agents_updates = [
+        append_agents_reference_if_missing(repo_root, Path(check_dir), args.dry_run)
+        for check_dir in sorted(touched_check_dirs)
+    ]
 
     output_payload = {
         "metadata": {
@@ -96,6 +161,7 @@ def main() -> int:
             "dry_run": args.dry_run,
         },
         "results": results,
+        "agents_updates": agents_updates,
     }
 
     result_output = Path(args.result_output)
