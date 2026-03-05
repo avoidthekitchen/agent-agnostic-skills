@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Write draft checks to .agents/checks with collision-safe naming.
-
-Also ensures root AGENTS.md references .agents/checks for code reviews.
-"""
+"""Write draft checks to .agents/checks with collision-safe naming."""
 
 from __future__ import annotations
 
@@ -11,20 +8,6 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-
-AGENTS_BLOCK_START = "<!-- bootstrap-checks-from-prs:checks:start -->"
-AGENTS_BLOCK_END = "<!-- bootstrap-checks-from-prs:checks:end -->"
-AGENTS_CHECKS_SECTION = """## Code Review Checks
-
-When performing code reviews, load and apply checks from `.agents/checks/`.
-Also apply subtree-scoped checks from `<subtree>/.agents/checks/` when reviewing files in that subtree.
-"""
-
-
-def managed_agents_block() -> str:
-    return (
-        f"{AGENTS_BLOCK_START}\n{AGENTS_CHECKS_SECTION.strip()}\n{AGENTS_BLOCK_END}\n"
-    )
 
 
 def read_json(path: Path) -> Any:
@@ -89,45 +72,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def ensure_agents_md(repo_root: Path, dry_run: bool) -> dict[str, Any]:
-    agents_path = repo_root / "AGENTS.md"
-    result = {
-        "path": "AGENTS.md",
-        "action": "unchanged",
-        "dry_run": dry_run,
-    }
-
-    block = managed_agents_block()
-
-    if not agents_path.exists():
-        content = "# AGENTS.md\n\n" + block
-        if not dry_run:
-            agents_path.write_text(content, encoding="utf-8")
-        result["action"] = "created"
-        return result
-
-    existing = agents_path.read_text(encoding="utf-8")
-    start = existing.find(AGENTS_BLOCK_START)
-    end = existing.find(AGENTS_BLOCK_END)
-
-    if start != -1 and end != -1 and start < end:
-        end_index = end + len(AGENTS_BLOCK_END)
-        if end_index < len(existing) and existing[end_index : end_index + 1] == "\n":
-            end_index += 1
-        updated = existing[:start] + block + existing[end_index:]
-    else:
-        suffix = "\n\n" if existing and not existing.endswith("\n\n") else ""
-        updated = existing + suffix + block
-
-    if updated == existing:
-        return result
-
-    if not dry_run:
-        agents_path.write_text(updated, encoding="utf-8")
-    result["action"] = "updated"
-    return result
-
-
 def main() -> int:
     args = parse_args()
     payload = read_json(Path(args.input))
@@ -161,8 +105,6 @@ def main() -> int:
             }
         )
 
-    agents_md_result = ensure_agents_md(repo_root=repo_root, dry_run=args.dry_run)
-
     output_payload = {
         "metadata": {
             "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -170,7 +112,6 @@ def main() -> int:
             "draft_count": len(payload.get("drafts", [])),
             "written_count": len(results),
             "dry_run": args.dry_run,
-            "agents_md": agents_md_result,
         },
         "results": results,
     }
@@ -180,9 +121,6 @@ def main() -> int:
 
     created_count = sum(1 for item in results if not item["dry_run"])
     print(f"Processed {len(results)} drafts ({created_count} files written)")
-    print(
-        f"AGENTS.md action: {agents_md_result['action']} ({agents_md_result['path']})"
-    )
     print(f"Wrote write-result metadata to {result_output}")
     return 0
 
