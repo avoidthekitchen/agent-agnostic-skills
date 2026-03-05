@@ -12,11 +12,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+AGENTS_BLOCK_START = "<!-- bootstrap-checks-from-prs:checks:start -->"
+AGENTS_BLOCK_END = "<!-- bootstrap-checks-from-prs:checks:end -->"
 AGENTS_CHECKS_SECTION = """## Code Review Checks
 
 When performing code reviews, load and apply checks from `.agents/checks/`.
 Also apply subtree-scoped checks from `<subtree>/.agents/checks/` when reviewing files in that subtree.
 """
+
+
+def managed_agents_block() -> str:
+    return (
+        f"{AGENTS_BLOCK_START}\n{AGENTS_CHECKS_SECTION.strip()}\n{AGENTS_BLOCK_END}\n"
+    )
 
 
 def read_json(path: Path) -> Any:
@@ -89,19 +97,31 @@ def ensure_agents_md(repo_root: Path, dry_run: bool) -> dict[str, Any]:
         "dry_run": dry_run,
     }
 
+    block = managed_agents_block()
+
     if not agents_path.exists():
-        content = "# AGENTS.md\n\n" + AGENTS_CHECKS_SECTION.strip() + "\n"
+        content = "# AGENTS.md\n\n" + block
         if not dry_run:
             agents_path.write_text(content, encoding="utf-8")
         result["action"] = "created"
         return result
 
     existing = agents_path.read_text(encoding="utf-8")
-    if ".agents/checks" in existing:
+    start = existing.find(AGENTS_BLOCK_START)
+    end = existing.find(AGENTS_BLOCK_END)
+
+    if start != -1 and end != -1 and start < end:
+        end_index = end + len(AGENTS_BLOCK_END)
+        if end_index < len(existing) and existing[end_index : end_index + 1] == "\n":
+            end_index += 1
+        updated = existing[:start] + block + existing[end_index:]
+    else:
+        suffix = "\n\n" if existing and not existing.endswith("\n\n") else ""
+        updated = existing + suffix + block
+
+    if updated == existing:
         return result
 
-    suffix = "\n\n" if existing and not existing.endswith("\n\n") else ""
-    updated = existing + suffix + AGENTS_CHECKS_SECTION.strip() + "\n"
     if not dry_run:
         agents_path.write_text(updated, encoding="utf-8")
     result["action"] = "updated"
