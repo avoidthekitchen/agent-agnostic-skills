@@ -10,6 +10,7 @@ Use this skill to mine recent merged PRs, infer recurring review expectations, a
 ## What This Skill Produces
 
 - Draft check files in `.agents/checks/*.md` (global) and `<area>/.agents/checks/*.md` (scoped)
+- Root `AGENTS.md` updated to reference `.agents/checks/` for code reviews (created if missing)
 - Evidence artifacts:
   - `artifacts/pr-scan.json`
   - `artifacts/rule-candidates.json`
@@ -69,6 +70,8 @@ If user provides custom inputs, pass them through all relevant scripts.
 
 - Never overwrite existing check files silently.
 - On filename collisions, use `-draft` suffix (or `-draft-N`).
+- Ensure root `AGENTS.md` references `.agents/checks/` for review checks.
+- If root `AGENTS.md` is missing, create it.
 - Keep one check per file.
 - Keep checks focused and actionable.
 - Favor a small high-signal initial set (`5-10` checks).

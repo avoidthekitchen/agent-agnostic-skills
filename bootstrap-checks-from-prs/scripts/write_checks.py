@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Write draft checks to .agents/checks with collision-safe naming."""
+"""Write draft checks to .agents/checks with collision-safe naming.
+
+Also ensures root AGENTS.md references .agents/checks for code reviews.
+"""
 
 from __future__ import annotations
 
@@ -9,6 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+AGENTS_CHECKS_SECTION = """## Code Review Checks
+
+When performing code reviews, load and apply checks from `.agents/checks/`.
+Also apply subtree-scoped checks from `<subtree>/.agents/checks/` when reviewing files in that subtree.
+"""
+
 
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -16,7 +25,9 @@ def read_json(path: Path) -> Any:
 
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+    )
 
 
 def ensure_safe_relative(path: str) -> Path:
@@ -51,11 +62,50 @@ def next_collision_safe_path(base_path: Path) -> tuple[Path, bool]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="artifacts/check-drafts.json", help="Draft check payload input")
+    parser.add_argument(
+        "--input",
+        default="artifacts/check-drafts.json",
+        help="Draft check payload input",
+    )
     parser.add_argument("--repo-root", default=".", help="Repository root path")
-    parser.add_argument("--result-output", default="artifacts/write-result.json", help="Write result JSON")
-    parser.add_argument("--dry-run", action="store_true", help="Do not write files; emit planned paths only")
+    parser.add_argument(
+        "--result-output",
+        default="artifacts/write-result.json",
+        help="Write result JSON",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Do not write files; emit planned paths only",
+    )
     return parser.parse_args()
+
+
+def ensure_agents_md(repo_root: Path, dry_run: bool) -> dict[str, Any]:
+    agents_path = repo_root / "AGENTS.md"
+    result = {
+        "path": "AGENTS.md",
+        "action": "unchanged",
+        "dry_run": dry_run,
+    }
+
+    if not agents_path.exists():
+        content = "# AGENTS.md\n\n" + AGENTS_CHECKS_SECTION.strip() + "\n"
+        if not dry_run:
+            agents_path.write_text(content, encoding="utf-8")
+        result["action"] = "created"
+        return result
+
+    existing = agents_path.read_text(encoding="utf-8")
+    if ".agents/checks" in existing:
+        return result
+
+    suffix = "\n\n" if existing and not existing.endswith("\n\n") else ""
+    updated = existing + suffix + AGENTS_CHECKS_SECTION.strip() + "\n"
+    if not dry_run:
+        agents_path.write_text(updated, encoding="utf-8")
+    result["action"] = "updated"
+    return result
 
 
 def main() -> int:
@@ -65,8 +115,12 @@ def main() -> int:
 
     results: list[dict[str, Any]] = []
     for draft in payload.get("drafts", []):
-        target_dir = ensure_safe_relative(str(draft.get("target_directory", ".agents/checks")))
-        filename = ensure_safe_relative(str(draft.get("filename", "draft-check.md"))).name
+        target_dir = ensure_safe_relative(
+            str(draft.get("target_directory", ".agents/checks"))
+        )
+        filename = ensure_safe_relative(
+            str(draft.get("filename", "draft-check.md"))
+        ).name
 
         absolute_dir = (repo_root / target_dir).resolve()
         absolute_path = absolute_dir / filename
@@ -87,6 +141,8 @@ def main() -> int:
             }
         )
 
+    agents_md_result = ensure_agents_md(repo_root=repo_root, dry_run=args.dry_run)
+
     output_payload = {
         "metadata": {
             "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -94,6 +150,7 @@ def main() -> int:
             "draft_count": len(payload.get("drafts", [])),
             "written_count": len(results),
             "dry_run": args.dry_run,
+            "agents_md": agents_md_result,
         },
         "results": results,
     }
@@ -103,6 +160,9 @@ def main() -> int:
 
     created_count = sum(1 for item in results if not item["dry_run"])
     print(f"Processed {len(results)} drafts ({created_count} files written)")
+    print(
+        f"AGENTS.md action: {agents_md_result['action']} ({agents_md_result['path']})"
+    )
     print(f"Wrote write-result metadata to {result_output}")
     return 0
 
