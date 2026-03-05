@@ -10,19 +10,19 @@ Per [`skills.sh`](https://skills.sh/docs/cli) docs/FAQ, install skills with the 
 npx skills add <owner>/<repo>
 ```
 
-Examples:
+Example for installing all the skills in this repository:
 
 ```bash
 npx skills add avoidthekitchen/agent-agnostic-skills
 ```
 
-To install this specific skill from this repository:
+To install just the bootstrap checks skill:
 
 ```bash
 npx skills add avoidthekitchen/agent-agnostic-skills@bootstrap-checks-from-prs
 ```
 
-Examples for the RPI skill set:
+To install all the RPI skill set:
 
 ```bash
 npx skills add avoidthekitchen/agent-agnostic-skills@rpi-research
@@ -44,7 +44,12 @@ Notes:
 
 ## RPI Skills: Research -> Plan -> Implement
 
-This repository includes a coordinated set of three RPI workflow skills:
+[RPI (Research, Plan, Implement)](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/ace-fca.md), introduced by HumanLayer, is a structured workflow for agents that helps with more complex changes with documented research and plan documents. This helps agents by:
+- Surfacing agent assumptions that you can correct
+- Tracking plans and implementation so that the agent does not lose context
+- Creating durable artifacts for both humans and agents to reference later
+
+This repository includes a coordinated set of three RPI workflow skills adapted from [akurkin's  Claude-specific command workflows](https://github.com/teambrilliant/claude-research-plan-implement). 
 
 ### `rpi-research`
 
@@ -62,16 +67,13 @@ This repository includes a coordinated set of three RPI workflow skills:
 - Executes an approved plan phase-by-phase.
 - Runs verification after each phase and updates plan checkboxes as work is completed.
 
-These RPI skills were adapted from Claude-specific command workflows in:
-- https://github.com/teambrilliant/claude-research-plan-implement
+## Bootstrap Checks: `bootstrap-checks-from-prs`
 
-## Included Skill: `bootstrap-checks-from-prs`
-
-`bootstrap-checks-from-prs` mines merged PR history and bootstraps draft Amp checks so teams can quickly codify recurring review expectations.
+`bootstrap-checks-from-prs` mines merged PR history and bootstraps draft "checks" so teams can quickly codify recurring review expectations for agents. This uses an agent agnostic checks folder structured proposed by [Amp Code](https://ampcode.com/manual#checks).
 
 What it does:
 
-- Collects merged PR metadata, changed files, review comments, issue comments, and check-run hints.
+- Collects merged PR metadata, changed files, non-bot review comments, issue comments, and check-run hints.
 - Extracts recurring review patterns and scores candidates by frequency, risk, detectability, and scope.
 - Renders high-signal check drafts and writes them to:
   - `.agents/checks/*.md` for repo-wide checks
