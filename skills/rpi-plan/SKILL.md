@@ -64,7 +64,8 @@ Does this phasing make sense?
 
 Write the plan to `rpi/plans/TIMESTAMP_descriptive_name.md`.
 
-- Use current UTC ISO timestamp for `TIMESTAMP` (for example `2026-03-05T22:10:00Z`).
+- Use a Windows-safe UTC timestamp for `TIMESTAMP`: `YYYYMMDDTHHMMSSZ` (for example `20260305T221000Z`).
+- Do not use `:` in filenames.
 - Use a short snake_case suffix for `descriptive_name`.
 - For every planned implementation change, add an explicit unchecked task item using `- [ ]`.
 - Do not leave changes as prose-only summaries; each actionable change must be trackable as a checkbox.

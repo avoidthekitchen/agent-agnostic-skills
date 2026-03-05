@@ -83,7 +83,8 @@ status: complete
 
 6. Save and present the result.
 - Save research notes to `rpi/research/TIMESTAMP_topic.md`.
-  - For the TIMESTAMP, use the current date and time in ISO format (e.g., `2023-10-01T12:34:56Z`).
+  - For `TIMESTAMP`, use a Windows-safe UTC format: `YYYYMMDDTHHMMSSZ` (e.g., `20260305T221000Z`).
+  - Do not use `:` in filenames.
 - Use a short snake_case topic slug for the filename suffix.
 - Reply to the user with a concise summary plus key file references.
 

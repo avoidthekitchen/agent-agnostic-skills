@@ -55,11 +55,13 @@ This repository includes a coordinated set of three RPI workflow skills adapted 
 
 - Performs deep codebase research with citations.
 - Produces a research memo at `rpi/research/TIMESTAMP_topic.md`.
+- Uses Windows-safe timestamps in filenames (`YYYYMMDDTHHMMSSZ`).
 
 ### `rpi-plan`
 
 - Turns requirements and research into a phased implementation plan.
 - Produces a plan at `rpi/plans/TIMESTAMP_descriptive_name.md`.
+- Uses Windows-safe timestamps in filenames (`YYYYMMDDTHHMMSSZ`).
 - Requires explicit unchecked implementation tasks (`- [ ]`) for planned changes.
 
 ### `rpi-implement-plan`
