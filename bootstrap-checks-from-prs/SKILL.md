@@ -10,6 +10,7 @@ Use this skill to mine recent merged PRs, infer recurring review expectations, a
 ## What This Skill Produces
 
 - Draft check files in `.agents/checks/*.md` (global) and `<area>/.agents/checks/*.md` (scoped)
+- Root `AGENTS.md` updated to reference `.agents/checks/` for code reviews (created if missing)
 - Evidence artifacts:
   - `artifacts/pr-scan.json`
   - `artifacts/rule-candidates.json`
@@ -57,7 +58,13 @@ python scripts/generate_check_drafts.py --max-checks 10 --default-severity mediu
 python scripts/write_checks.py
 ```
 
-5. Generate review report
+5. Ensure root `AGENTS.md` references checks
+
+- If root `AGENTS.md` is missing, create it.
+- Add code-review guidance that tells agents to load `.agents/checks/` and relevant subtree-scoped `<subtree>/.agents/checks/`.
+- Preserve existing instructions; append a focused section if needed.
+
+6. Generate review report
 
 ```bash
 python scripts/generate_report.py
@@ -69,6 +76,9 @@ If user provides custom inputs, pass them through all relevant scripts.
 
 - Never overwrite existing check files silently.
 - On filename collisions, use `-draft` suffix (or `-draft-N`).
+- Ensure root `AGENTS.md` references `.agents/checks/` for review checks.
+- If root `AGENTS.md` is missing, create it.
+- Do not rely on `write_checks.py` to mutate `AGENTS.md`; enforce this in agent workflow.
 - Keep one check per file.
 - Keep checks focused and actionable.
 - Favor a small high-signal initial set (`5-10` checks).

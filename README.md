@@ -38,6 +38,7 @@ What it does:
 - Renders high-signal check drafts and writes them to:
   - `.agents/checks/*.md` for repo-wide checks
   - `<area>/.agents/checks/*.md` for subtree-scoped checks
+- Includes a workflow step to ensure root `AGENTS.md` references `.agents/checks/` for code reviews (creating it if missing).
 - Generates evidence artifacts and a reviewer-focused bootstrap report.
 
 Skill location:
@@ -74,6 +75,7 @@ Notes:
 
 - Requires `python3` and authenticated `gh` CLI access.
 - Check file collisions are handled safely with `-draft` suffixing; existing checks are not overwritten silently.
+- The skill workflow includes an explicit `AGENTS.md` update step so review agents load checks from `.agents/checks/`.
 
 ### Re-running the Skill
 
