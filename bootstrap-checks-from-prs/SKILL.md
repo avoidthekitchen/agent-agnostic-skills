@@ -10,6 +10,7 @@ Use this skill to mine recent merged PRs, infer recurring review expectations, a
 ## What This Skill Produces
 
 - Draft check files in `.agents/checks/*.md` (global) and `<area>/.agents/checks/*.md` (scoped)
+- `AGENTS.md` in repository root (created or updated to reference `.agents/checks` for code reviews)
 - Evidence artifacts:
   - `artifacts/pr-scan.json`
   - `artifacts/rule-candidates.json`
@@ -57,6 +58,8 @@ python scripts/generate_check_drafts.py --max-checks 10 --default-severity mediu
 python scripts/write_checks.py
 ```
 
+   This step also creates or updates `AGENTS.md` in the repository root to reference `.agents/checks` for code reviews. If `AGENTS.md` already contains the reference, it will not be modified.
+
 5. Generate review report
 
 ```bash
@@ -84,3 +87,5 @@ Return a concise report with:
 - Suggested decision for each check (`keep`, `refine`, `drop`)
 
 Then recommend calibration on a holdout PR/diff before broad adoption.
+
+Note: `AGENTS.md` has been created or updated in the repository root to reference `.agents/checks` for code reviews.

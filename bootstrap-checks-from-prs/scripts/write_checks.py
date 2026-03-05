@@ -16,7 +16,36 @@ def read_json(path: Path) -> Any:
 
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+    )
+
+
+def update_agents_md(repo_root: Path) -> None:
+    """Create or update AGENTS.md to reference .agents/checks for code reviews."""
+    agents_md_path = repo_root / "AGENTS.md"
+    checks_dir_reference = "## Code Review Checks\n\nCode review checks are located in `.agents/checks/`. Agents should reference these checks during code reviews.\n\n- Global checks: `.agents/checks/*.md`\n- Subtree-scoped checks: `<area>/.agents/checks/*.md`"
+
+    if agents_md_path.exists():
+        existing_content = agents_md_path.read_text(encoding="utf-8")
+
+        # Check if the checks reference already exists
+        if (
+            ".agents/checks/" in existing_content
+            and "Code Review Checks" in existing_content
+        ):
+            print("AGENTS.md already contains .agents/checks reference")
+            return
+
+        # Append the checks reference if it doesn't exist
+        updated_content = existing_content.rstrip() + "\n\n" + checks_dir_reference
+        agents_md_path.write_text(updated_content, encoding="utf-8")
+        print(f"Updated AGENTS.md with .agents/checks reference")
+    else:
+        # Create new AGENTS.md with the checks reference
+        new_content = "# Agent Configuration\n\n" + checks_dir_reference + "\n"
+        agents_md_path.write_text(new_content, encoding="utf-8")
+        print(f"Created AGENTS.md with .agents/checks reference")
 
 
 def ensure_safe_relative(path: str) -> Path:
@@ -51,10 +80,22 @@ def next_collision_safe_path(base_path: Path) -> tuple[Path, bool]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="artifacts/check-drafts.json", help="Draft check payload input")
+    parser.add_argument(
+        "--input",
+        default="artifacts/check-drafts.json",
+        help="Draft check payload input",
+    )
     parser.add_argument("--repo-root", default=".", help="Repository root path")
-    parser.add_argument("--result-output", default="artifacts/write-result.json", help="Write result JSON")
-    parser.add_argument("--dry-run", action="store_true", help="Do not write files; emit planned paths only")
+    parser.add_argument(
+        "--result-output",
+        default="artifacts/write-result.json",
+        help="Write result JSON",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Do not write files; emit planned paths only",
+    )
     return parser.parse_args()
 
 
@@ -65,8 +106,12 @@ def main() -> int:
 
     results: list[dict[str, Any]] = []
     for draft in payload.get("drafts", []):
-        target_dir = ensure_safe_relative(str(draft.get("target_directory", ".agents/checks")))
-        filename = ensure_safe_relative(str(draft.get("filename", "draft-check.md"))).name
+        target_dir = ensure_safe_relative(
+            str(draft.get("target_directory", ".agents/checks"))
+        )
+        filename = ensure_safe_relative(
+            str(draft.get("filename", "draft-check.md"))
+        ).name
 
         absolute_dir = (repo_root / target_dir).resolve()
         absolute_path = absolute_dir / filename
@@ -104,6 +149,11 @@ def main() -> int:
     created_count = sum(1 for item in results if not item["dry_run"])
     print(f"Processed {len(results)} drafts ({created_count} files written)")
     print(f"Wrote write-result metadata to {result_output}")
+
+    # Update AGENTS.md to reference .agents/checks for code reviews
+    if not args.dry_run and created_count > 0:
+        update_agents_md(repo_root)
+
     return 0
 
 
