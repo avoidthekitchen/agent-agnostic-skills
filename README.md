@@ -1,6 +1,6 @@
 # agent-agnostic-skills
 
-This repository contains agent skills built to the [`agentskills.io`](https://agentskills.io/specification) specification.
+This repository contains my proposed agent skills built to the [`agentskills.io`](https://agentskills.io/specification) specification.
 
 ## Install a Skill
 
