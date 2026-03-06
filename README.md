@@ -10,16 +10,24 @@ Per [`skills.sh`](https://skills.sh/docs/cli) docs/FAQ, install skills with the 
 npx skills add <owner>/<repo>
 ```
 
-Examples:
+Example for installing all the skills in this repository:
 
 ```bash
 npx skills add avoidthekitchen/agent-agnostic-skills
 ```
 
-To install this specific skill from this repository:
+To install just the bootstrap checks skill:
 
 ```bash
 npx skills add avoidthekitchen/agent-agnostic-skills@bootstrap-checks-from-prs
+```
+
+To install all the RPI skill set:
+
+```bash
+npx skills add avoidthekitchen/agent-agnostic-skills@rpi-research
+npx skills add avoidthekitchen/agent-agnostic-skills@rpi-plan
+npx skills add avoidthekitchen/agent-agnostic-skills@rpi-implement-plan
 ```
 
 Notes:
@@ -27,13 +35,47 @@ Notes:
 - Skills are supported by popular coding agents such as Claude Code, Cursor, and Windsurf (check per-skill compatibility).
 - Review a skill's repository before installing and use your normal security review process.
 
-## Included Skill: `bootstrap-checks-from-prs`
+## Included Skills
 
-`bootstrap-checks-from-prs` mines merged PR history and bootstraps draft Amp checks so teams can quickly codify recurring review expectations.
+- `bootstrap-checks-from-prs`
+- `rpi-research`
+- `rpi-plan`
+- `rpi-implement-plan`
+
+## RPI Skills: Research -> Plan -> Implement
+
+[RPI (Research, Plan, Implement)](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/ace-fca.md), introduced by HumanLayer, is a structured workflow for agents that helps with more complex changes with documented research and plan documents. This helps agents by:
+- Surfacing agent assumptions that you can correct
+- Tracking plans and implementation so that the agent does not lose context
+- Creating durable artifacts for both humans and agents to reference later
+
+This repository includes a coordinated set of three RPI workflow skills adapted from [akurkin's  Claude-specific command workflows](https://github.com/teambrilliant/claude-research-plan-implement). 
+
+### `rpi-research`
+
+- Performs deep codebase research with citations.
+- Produces a research memo at `rpi/research/TIMESTAMP_topic.md`.
+- Uses Windows-safe timestamps in filenames (`YYYYMMDDTHHMMSSZ`).
+
+### `rpi-plan`
+
+- Turns requirements and research into a phased implementation plan.
+- Produces a plan at `rpi/plans/TIMESTAMP_descriptive_name.md`.
+- Uses Windows-safe timestamps in filenames (`YYYYMMDDTHHMMSSZ`).
+- Requires explicit unchecked implementation tasks (`- [ ]`) for planned changes.
+
+### `rpi-implement-plan`
+
+- Executes an approved plan phase-by-phase.
+- Runs verification after each phase and updates plan checkboxes as work is completed.
+
+## Bootstrap Checks: `bootstrap-checks-from-prs`
+
+`bootstrap-checks-from-prs` mines merged PR history and bootstraps draft "checks" so teams can quickly codify recurring review expectations for agents. This uses an agent agnostic checks folder structured proposed by [Amp Code](https://ampcode.com/manual#checks).
 
 What it does:
 
-- Collects merged PR metadata, changed files, review comments, issue comments, and check-run hints.
+- Collects merged PR metadata, changed files, non-bot review comments, issue comments, and check-run hints.
 - Extracts recurring review patterns and scores candidates by frequency, risk, detectability, and scope.
 - Renders high-signal check drafts and writes them to:
   - `.agents/checks/*.md` for repo-wide checks
@@ -43,17 +85,17 @@ What it does:
 
 Skill location:
 
-- `bootstrap-checks-from-prs/SKILL.md`
+- `skills/bootstrap-checks-from-prs/SKILL.md`
 
 Core pipeline scripts:
 
-- `bootstrap-checks-from-prs/scripts/collect_prs.py`
-- `bootstrap-checks-from-prs/scripts/extract_rule_candidates.py`
-- `bootstrap-checks-from-prs/scripts/generate_check_drafts.py`
-- `bootstrap-checks-from-prs/scripts/write_checks.py`
-- `bootstrap-checks-from-prs/scripts/generate_report.py`
+- `skills/bootstrap-checks-from-prs/scripts/collect_prs.py`
+- `skills/bootstrap-checks-from-prs/scripts/extract_rule_candidates.py`
+- `skills/bootstrap-checks-from-prs/scripts/generate_check_drafts.py`
+- `skills/bootstrap-checks-from-prs/scripts/write_checks.py`
+- `skills/bootstrap-checks-from-prs/scripts/generate_report.py`
 
-### Quick Run (from `bootstrap-checks-from-prs/`)
+### Quick Run (from `skills/bootstrap-checks-from-prs/`)
 
 ```bash
 python3 scripts/collect_prs.py --x 30
