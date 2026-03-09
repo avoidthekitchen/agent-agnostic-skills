@@ -62,10 +62,9 @@ Does this phasing make sense?
 
 ### Step 4: Detailed Plan Authoring
 
-Write the plan to `rpi/plans/TIMESTAMP_descriptive_name.md`.
+Write the plan to `rpi/plans/TIMESTAMP_plan_descriptive_name.md`.
 
-- Use a Windows-safe UTC timestamp for `TIMESTAMP`: `YYYYMMDDTHHMMSSZ` (for example `20260305T221000Z`).
-- Do not use `:` in filenames.
+- Use a Windows-safe timestamp for `TIMESTAMP`: `YYYY-MM-DD-HH-MM` (for example `2026-03-05-22-10`).
 - Use a short snake_case suffix for `descriptive_name`.
 - For every planned implementation change, add an explicit unchecked task item using `- [ ]`.
 - Do not leave changes as prose-only summaries; each actionable change must be trackable as a checkbox.

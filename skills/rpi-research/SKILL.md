@@ -82,10 +82,9 @@ status: complete
 ```
 
 6. Save and present the result.
-- Save research notes to `rpi/research/TIMESTAMP_topic.md`.
-  - For `TIMESTAMP`, use a Windows-safe UTC format: `YYYYMMDDTHHMMSSZ` (e.g., `20260305T221000Z`).
-  - Do not use `:` in filenames.
-- Use a short snake_case topic slug for the filename suffix.
+- Save research notes to `rpi/research/TIMESTAMP_research_topic.md`.
+  - For `TIMESTAMP`, Use a Windows-safe timestamp for `TIMESTAMP`: `YYYY-MM-DD-HH-MM` (e.g., `2026-03-05-22-10`).
+- Use a short snake_case topic slug for the filename suffix `topic`.
 - Reply to the user with a concise summary plus key file references.
 
 ## Quality Bar
