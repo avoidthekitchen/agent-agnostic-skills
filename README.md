@@ -38,9 +38,54 @@ Notes:
 ## Included Skills
 
 - `bootstrap-checks-from-prs`
+- `idea-validator`
 - `rpi-research`
 - `rpi-plan`
 - `rpi-implement-plan`
+
+## Idea Validator: `idea-validator`
+
+`idea-validator` pressure-tests startup and product ideas against live market signals. Given a product or business idea, it searches Reddit for pain-point evidence, checks Google Trends for demand trajectory, and scans the web for competitive landscape — then synthesizes everything into a quick-screen scorecard with a verdict.
+
+What it does:
+
+- Extracts core problem terms, audience descriptors, and candidate subreddits from the user's idea thesis.
+- Gathers evidence from three sources in parallel:
+  - **Reddit** — searches for pain-point posts with frustration signals (public JSON endpoints, no API key needed).
+  - **Google Trends** — checks 12-month and 5-year interest trajectories via `trendspy` (no API key needed).
+  - **Web search** — scans for competitors using DuckDuckGo (always available), Tavily (`TAVILY_API_KEY`), and Brave Search (`BRAVE_API_KEY`).
+- Produces a structured scorecard with ratings for pain point evidence, trend direction, and competitor density.
+- Delivers a quick verdict: *Investigate Further*, *Proceed with Caution*, or *Kill*.
+
+Skill location:
+
+- `skills/idea-validator/SKILL.md`
+
+Scoring reference:
+
+- `skills/idea-validator/references/scoring-rubric.md`
+
+Core pipeline scripts:
+
+- `skills/idea-validator/scripts/reddit_search.py`
+- `skills/idea-validator/scripts/trends_check.py`
+- `skills/idea-validator/scripts/web_scan.py`
+
+### Quick Run (from `skills/idea-validator/`)
+
+```bash
+uv sync
+uv run python scripts/reddit_search.py --keywords "keyword1,keyword2" --subreddits "sub1,sub2,sub3"
+uv run python scripts/trends_check.py --keywords "keyword1,keyword2"
+uv run python scripts/web_scan.py --query "descriptive search query about the product space"
+```
+
+Notes:
+
+- Requires `uv` for dependency management (`uv sync` to install).
+- DuckDuckGo always works without configuration. Add Tavily or Brave API keys for better web search coverage.
+- Reddit and Google Trends require no API keys.
+- Scripts return structured JSON; the scorecard synthesis is handled by the agent following the SKILL.md pipeline.
 
 ## RPI Skills: Research -> Plan -> Implement
 
