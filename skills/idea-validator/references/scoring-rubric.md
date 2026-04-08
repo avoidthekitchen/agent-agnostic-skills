@@ -1,5 +1,9 @@
 # Scoring Rubric — Quick Screen
 
+This rubric covers the three scoring dimensions used in **Quick Screen mode**.
+For Deep Dive mode, this rubric still applies as the foundation. The additional
+Deep Dive analysis is covered in `deep-dive-rubric.md`.
+
 Use this rubric to score each dimension of an idea. The goal is consistency:
 two different runs on the same idea should produce similar verdicts. Ground
 every score in the data the scripts returned.
@@ -127,6 +131,38 @@ QUICK VERDICT:          Investigate Further
     Competition is moderate but the freelancer-specific angle is underserved.
     Key risk: freelancers may be unwilling to pay for invoicing tools given
     free alternatives.
+
+COMPETITOR PROFILE:
+  | Competitor    | Target Audience     | Pricing   | Maturity   | Key Differentiator |
+  |---------------|--------------------| --------- | --------- | ------------------- |
+  | Wave          | Small businesses   | Free      | Mature     | Full accounting suite, free tier |
+  | Invoice Ninja | Freelancers, SMBs  | Freemium  | Established| Open source, self-hostable |
+  | Zoho Invoice  | Small businesses   | Freemium  | Mature     | Part of Zoho ecosystem |
+  | FreshBooks    | Freelancers, agencies| Paid    | Mature     | Strong brand, time tracking |
+
+PERCEPTUAL MAP:
+  Axis X: Broad SMB accounting → Freelancer-specific
+  Axis Y: Manual process → Automated reconciliation
+
+                    Automated
+                        |
+                   Zoho Invoice
+                        |
+   Broad SMB --------+-------- Freelancer-specific
+                        |
+            Wave      |     Invoice Ninja
+                   FreshBooks
+                        |
+                    Manual
+
+  The freelancer-specific + automated reconciliation quadrant is empty.
+  Invoice Ninja is closest but focuses on invoicing, not reconciliation.
+  This is the whitespace.
+
+DATA SOURCES:
+  → Reddit: 23 posts across 3 subreddits (strong)
+  → Google Trends: 2 keywords, both positive slopes (accelerating)
+  → Web results: 4 competitors, 2 informational (brave+tavily+duckduckgo)
 ```
 
 ### Example 2: Kill Signal
@@ -153,6 +189,19 @@ QUICK VERDICT:          Kill
     Reddit posts in two years across all searched communities suggests the
     addressable audience is extremely small. A social network requires critical
     mass to be useful — this idea lacks the demand signal to get there.
+
+COMPETITOR PROFILE:
+  No direct competitors found — the competitive whitespace is open.
+
+PERCEPTUAL MAP:
+  Insufficient competitors to map. Only informal communities (Facebook groups)
+    exist, with no products to position against. The absence of competitors
+    here is not an opportunity — it reflects a lack of market.
+
+DATA SOURCES:
+  → Reddit: 2 posts in 24 months across 6 subreddits (weak)
+  → Google Trends: Negligible volume, flat (flat)
+  → Web results: 0 competitors, 3 informational (duckduckgo only)
 ```
 
 ### Example 3: Caution Signal
@@ -179,4 +228,40 @@ QUICK VERDICT:          Proceed with Caution
     differentiation angle against 8+ mature competitors in a flat market.
     A niche focus (e.g., dietary restrictions, budget constraints) might work,
     but the default "meal planning app" is a tough space.
+
+COMPETITOR PROFILE:
+  | Competitor  | Target Audience        | Pricing   | Maturity   | Key Differentiator |
+  |-------------|----------------------| --------- | --------- | ------------------- |
+  | AnyList     | General consumers     | Freemium  | Mature     | Shared lists, recipe saving |
+  | Paprika 3   | Home cooks            | Paid ($5) | Mature     | Powerful recipe management |
+  | Mealime     | Health-conscious       | Free      | Established| Personalized meal plans |
+  | Yummly      | General consumers     | Free      | Mature     | Owned by Whirlpool, smart appliance integration |
+  | SideChef    | Home cooks            | Freemium  | Established| Step-by-step cooking mode |
+  | Plan to Eat | Planning-focused users | Paid      | Established| Drag-and-drop meal planner |
+
+PERCEPTUAL MAP:
+  Axis X: General recipes → Dietary-specific (keto, allergy, budget)
+  Axis Y: Recipe discovery → Automated planning + shopping
+
+               Automated Planning
+                      |
+                      |
+                      |
+   General ------Plan to Eat------ Dietary-specific
+   Recipes       SideChef         Mealime
+                 Paprika 3
+                 AnyList          [EMPTY]
+                      |
+                      |
+               Recipe Discovery
+
+  The dietary-specific + automated planning quadrant is underserved.
+  Mealime touches dietary preferences but is more discovery-focused.
+  However, in a flat market with 8+ mature competitors, a niche entry
+  would need strong execution and retention.
+
+DATA SOURCES:
+  → Reddit: 7 posts across 2 subreddits (moderate)
+  → Google Trends: Stable to slight decline (flat)
+  → Web results: 8+ competitors, 4 informational (brave+tavily+duckduckgo)
 ```

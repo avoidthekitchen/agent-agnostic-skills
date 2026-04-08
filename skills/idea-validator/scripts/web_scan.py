@@ -57,6 +57,52 @@ DOMAIN_BLACKLIST = [
 ]
 
 
+def extract_competitor_signals(title, description, url):
+    combined = f"{title} {description}".lower()
+
+    pricing = "unknown"
+    if any(p in combined for p in ["free tier", "free plan", "free forever"]):
+        pricing = "free"
+    elif any(
+        p in combined for p in ["freemium", "free trial", "start free", "try free"]
+    ):
+        pricing = "freemium"
+    elif any(
+        p in combined
+        for p in ["pricing", "paid", "subscription", "plans", "$", "per month"]
+    ):
+        pricing = "paid"
+
+    audience = "general"
+    if any(a in combined for a in ["enterprise", "b2b", "business", "team", "company"]):
+        audience = "business"
+    elif any(
+        a in combined
+        for a in ["freelancer", "solo", "personal", "individual", "consumer"]
+    ):
+        audience = "consumer"
+    elif any(a in combined for a in ["developer", "api", "open source", "github"]):
+        audience = "developer"
+
+    maturity = "emerging"
+    if any(
+        m in combined
+        for m in ["established", "trusted by", "thousands", "millions", "users"]
+    ):
+        maturity = "established"
+    elif any(
+        m in combined
+        for m in ["mature", "industry standard", "leading", "most popular"]
+    ):
+        maturity = "mature"
+
+    return {
+        "pricing_inferred": pricing,
+        "audience_inferred": audience,
+        "maturity_inferred": maturity,
+    }
+
+
 def categorize_result(title, description, url):
     combined = f"{title} {description}".lower()
 
@@ -306,7 +352,11 @@ def analyze(query):
 
     for r in merged:
         category = categorize_result(r["title"], r["description"], r["url"])
-        categorized[category].append(r)
+        entry = {**r, "category": category}
+        if category in ("direct_competitor", "adjacent_tool"):
+            signals = extract_competitor_signals(r["title"], r["description"], r["url"])
+            entry.update(signals)
+        categorized[category].append(entry)
 
     return {
         "error": None,
@@ -324,7 +374,14 @@ def analyze(query):
             "informational_count": len(categorized["informational"]),
             "dead_count": len(categorized["dead_project"]),
             "top_competitors": [
-                {"title": c["title"], "url": c["url"]}
+                {
+                    "title": c["title"],
+                    "url": c["url"],
+                    "description": c.get("description", ""),
+                    "pricing_inferred": c.get("pricing_inferred", "unknown"),
+                    "audience_inferred": c.get("audience_inferred", "general"),
+                    "maturity_inferred": c.get("maturity_inferred", "emerging"),
+                }
                 for c in categorized["direct_competitor"][:5]
             ],
         },
